@@ -3,6 +3,7 @@
         this.conexao = conexao
         this.criarAtendimentos()
         this.criarVacinas()
+        this.criarPets()
     }
 
     criarAtendimentos(conexao){
@@ -23,6 +24,17 @@
                 console.error(erro)
             }else{
                 console.log('Tabela vacinas criada com sucesso ou já criada anteriomente')
+            }
+        })
+    }
+    criarPets(conexao){
+        const sql = 'create table IF NOT EXISTS Pets (id int NOT NULL AUTO_INCREMENT, nome varchar(50), imagem varchar(200), PRIMARY KEY(id))'
+
+        this.conexao.query(sql, erro => {
+            if (erro){
+                console.error(erro)
+            } else {
+                console.log('Tabela pets criada com sucesso ou existente na base de dados.')
             }
         })
     }
