@@ -1,8 +1,8 @@
 const { default: axios } = require('axios')
 const moment = require('moment')
 const atendimento = require('../controllers/atendimento')
-const conexao = require('../infraestrutura/conexao')
-
+const conexao = require('../infraestrutura/database/conexao')
+const repositorio = require('../repositorios/atendimentos')
 class Atendimento {
     adiciona(atendimento, response){
         const dataCriacao = moment().format('YYYY-MM-DD HH:MM:ss')
@@ -27,18 +27,21 @@ class Atendimento {
         const existemErros = erros.length
 
         if(existemErros){
-            response.status(400).json(erros)
+            return new Promise((resolve, reject) =>{
+                reject(erros)
+            })
         }else{
             const atendimentoDatado = {...atendimento, dataCriacao, data}
-            const sql = 'insert into Atendimentos set ?'
-    
-            conexao.query(sql, atendimentoDatado, (erro, resultados) => {
-                if(erro){
-                    response.status(400).json(erro)
-                }else{
-                    response.status(201).json(atendimento)
+            
+            return repositorio.adiciona(atendimentoDatado)
+                .then(resultados => {
+                    const id = resultados.insertId
+                    //Para visualizar as propriedade de result mysql
+                    //console.log(resultados)
+                    return {...atendimento, id}
                 }
-            })
+            )
+
         }
 
 
