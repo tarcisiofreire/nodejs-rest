@@ -1,3 +1,4 @@
+const { default: axios } = require('axios')
 const moment = require('moment')
 const atendimento = require('../controllers/atendimento')
 const conexao = require('../infraestrutura/conexao')
@@ -57,13 +58,21 @@ class Atendimento {
     item(id, response){
         //const sql = 'SELECT * FROM Atendimentos WHERE id = ?' Funciona
         const sql = `SELECT * FROM Atendimentos WHERE id = ${id}`
-        conexao.query(sql, (erro, resultado)=>{
-            const atendimento = resultado[0]
-            if(erro){
+        conexao.query(sql, async (erro, resultado)=>{
+            let atendimento = resultado[0]
+            console.log(id + " " + resultado)
+            const cpf = atendimento.cliente
+            if (!resultado.length){
+                atendimento = {"mensagem" : "Não há atendimentos registrados para este id"}
+            }
+            
+            if (erro)  {
                 response.status(400).json(erro)
-            }else(
+            } else {
+                const { data } = await axios.get(`http://localhost:8082/${cpf}`)
+                atendimento.cliente = data
                 response.status(200).json(atendimento)
-            )
+            }
         })
     }
 
