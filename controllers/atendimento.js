@@ -2,8 +2,11 @@ const Atendimento = require('../models/atendimentos')
 
 module.exports = app => { 
     app.get('/atendimentos', (request, response) => {
-        Atendimento.lista(response);
+        Atendimento.lista()
+            .then(resultados => response.json(resultados))
+            .catch(erros => response.status(400).json(erros))
     })
+
 
     app.get('/atendimentos/:id', (req, res)=>{
         const id = parseInt(req.params.id)
@@ -26,6 +29,8 @@ module.exports = app => {
 
     app.delete('/atendimentos/:id', (req, res) => {
         const id = parseInt(req.params.id)
-        Atendimento.deleta(id, res)
+        Atendimento.deleta(id)
+            .then(id => res.status(200).json({id}))
+            .catch(erros => res.status(400).json(erros))
     })
 }
